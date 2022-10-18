@@ -1,0 +1,63 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.search {
+  position: absolute;
+  top: 6rem;
+  left: 64%;
+  z-index: 20;
+}
+
+
+.alevel {
+  position: absolute;
+  top: 5rem;
+  left: 1rem;
+  color: #281414;
+  z-index: 10;
+  margin: 0;
+  padding: 0;
+  background-color: aliceblue;
+  padding: 1rem;
+  border-radius: 1rem;
+  border-color: rgb(0, 0, 0);
+ 
+
+}
+
+
+.alevel img{
+  width: 2rem;
+  height: 2rem;
+}
+
+
+.NameAccount {
+  font-size: medium;
+  color: whitesmoke;
+}
+
+.Description {
+  font-size: medium;
+  padding: 0;
+  width: 500px;
+}
+.Description h2 {
+  padding: 0;
+}
+.Description div {
+  display: flex;
+}
+.Description p {
+  width: 60%;
+  padding: 0;
+}
+.Description img {
+  height: 150px;
+}
+.imgtest {
+  width: 100px;
+}
