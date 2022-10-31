@@ -14,7 +14,7 @@ func main() {
 	// User Routes
 	r.GET("/accidents", controller.ListAccidents)
 	r.GET("/accidentsActive", controller.ListAccidentsActive)
-	r.GET("/accidents/count", controller.GetCountAccidents)
+	r.GET("/accidents/count", controller.GetCountAccidentsActive)
 	r.GET("/accidents/:id", controller.GetAccidents)
 	r.POST("/accidents", controller.CreateAccidents)
 

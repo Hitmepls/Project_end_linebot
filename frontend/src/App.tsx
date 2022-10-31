@@ -1,6 +1,5 @@
 import { useState } from "react";
 import GoogleMap from "./component/Map";
-import Test from "./component/Test";
 import Nav from "./component/Nav";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -25,7 +24,6 @@ function App() {
               />
             }
           />
-          <Route path="/Test" element={<Test />} />
         </Routes>
       </BrowserRouter>
     </div>

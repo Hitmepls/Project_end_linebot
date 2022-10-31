@@ -6,6 +6,11 @@ import (
 	"gorm.io/gorm"
 )
 
+type Picture struct {
+	gorm.Model
+	Data string
+}
+
 type Accident struct {
 	gorm.Model
 	Description     string

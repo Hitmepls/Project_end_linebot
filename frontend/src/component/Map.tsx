@@ -21,7 +21,7 @@ import usePlacesAutocomplete, {
   getGeocode,
   getLatLng,
 } from "use-places-autocomplete";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Dialog from "@mui/material/Dialog";
 const apikey = process.env.REACT_APP_GOOGLE_MAP_API_KEY;
 
 type Dataprops = {
@@ -41,6 +41,7 @@ function MapsHere(props: Dataprops) {
   const [state1, setState1] = useState(true);
   const [state2, setState2] = useState(true);
   const [state3, setState3] = useState(false);
+  const [imgpop, setImgpop] = useState(false);
 
   const levelacident = [level1, level2, level3];
   const level = [l1, l2, l3];
@@ -66,6 +67,10 @@ function MapsHere(props: Dataprops) {
       setImgUrl(String(base64data));
     };
   }
+  const handleimg = () => {
+    setImgpop(!imgpop);
+    console.log(imgpop);
+  };
   const getAccident = async () => {
     const apiUrl = "http://localhost:8080/accidents";
     const requestOptions = {
@@ -164,6 +169,11 @@ function MapsHere(props: Dataprops) {
           </Stack>
         </Stack>
       </div>
+      {imgpop && (
+        <Dialog style={{ position: "absolute" }} open onClick={handleimg}>
+          <img src={imgUrl} onClick={handleimg} alt="no image" />
+        </Dialog>
+      )}
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         zoom={12}
@@ -178,6 +188,7 @@ function MapsHere(props: Dataprops) {
           )
           .map((item: AccidentsInterface) => (
             <MarkerF
+              zIndex={item.LevelID}
               key={String(item.ID)}
               position={
                 new google.maps.LatLng(
@@ -229,7 +240,7 @@ function MapsHere(props: Dataprops) {
                   <br />
                   สถานะการดำเนินการ: {selected.ProcessStatus.Name}
                 </p>
-                <img src={imgUrl} alt="รูปอุบัติเหตุ" />
+                <img src={imgUrl} onClick={handleimg} alt="รูปอุบัติเหตุ" />
               </div>
             </div>
           </InfoWindowF>
@@ -243,7 +254,7 @@ export default MapsHere;
 function Search(props: { panTo: (lat: number, lng: number) => void }) {
   const {
     ready,
-    value,
+    // value,
     suggestions: { status, data },
     setValue,
     clearSuggestions,

@@ -34,9 +34,9 @@ func GetAccidents(c *gin.Context) {
 }
 
 // GET /count acident
-func GetCountAccidents(c *gin.Context) {
+func GetCountAccidentsActive(c *gin.Context) {
 	var count int64
-	if err := entity.DB().Raw("SELECT count(id) FROM Accidents").Find(&count).Error; err != nil {
+	if err := entity.DB().Raw("SELECT count(id) FROM Accidents where process_status_id < 3").Find(&count).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

@@ -29,7 +29,6 @@ const API = "http://localhost:8080/";
 const dictState = {};
 const dictData = {};
 const Reporter = {};
-const base64 = [];
 
 function GetReporter() {
   axios
@@ -63,7 +62,7 @@ const handleEvent = async (event) => {
   if (event.message?.text == "วิธีการใช้งาน") {
     const CustomPayload = {
       type: "text",
-      text: 'นี้คือวิธีการแจ้งอุบัติเหตุ \n1.พิมพ์คำว่า "แจ้งอุบัติเหตุ" \n2.ส่งข้อความ รายละเอียด"\n3.ส่งรูปอุบัติเหตุ\n4.บอกระดับอุบัติเหตุ\n5.share locations\n6.เบอร์โทรศัพ',
+      text: 'นี้คือวิธีการแจ้งอุบัติเหตุ \n1.พิมพ์คำว่า "แจ้งอุบัติเหตุ" \n2.ส่งข้อความ รายละเอียด"\n3.ส่งรูปอุบัติเหตุ\n4.บอกระดับอุบัติเหตุ\n5.share locations\n6.เบอร์โทรศัพ\nสามารถยกเลิกได้ด้วยการพิมพ์ "ยกเลิก"',
       quickReply: {
         items: [
           {
@@ -127,10 +126,30 @@ const handleEvent = async (event) => {
                 fillInText: "-d",
               },
             },
+            {
+              type: "action",
+              action: {
+                type: "message",
+                label: "ยกเลิก",
+                text: "ยกเลิก",
+              },
+            },
           ],
         },
       },
     ];
+    ReplyMessage(event.replyToken, CustomPayload);
+  } else if (
+    dictState[event.source.userId] >= 0 &&
+    event.message?.text == "ยกเลิก"
+  ) {
+    delete dictData[event.source.userId];
+    delete dictState[event.source.userId];
+
+    const CustomPayload = {
+      type: "text",
+      text: "การแจ้งของท่านถูกยกเลิกแล้ว",
+    };
     ReplyMessage(event.replyToken, CustomPayload);
   } else if (dictState[event.source.userId] == 0) {
     if (RegexDes.test(event.message?.text)) {
@@ -155,6 +174,14 @@ const handleEvent = async (event) => {
                 label: "เปิดกล้อง",
               },
             },
+            {
+              type: "action",
+              action: {
+                type: "message",
+                label: "ยกเลิก",
+                text: "ยกเลิก",
+              },
+            },
           ],
         },
       };
@@ -169,17 +196,7 @@ const handleEvent = async (event) => {
   } else if (dictState[event.source.userId] == 1) {
     if (event.message.type == "image") {
       dictState[event.source.userId] = 2;
-      // client.getMessageContent(event.message.id).then((stream) => {
-      //   stream.on("data", (chunk) => {
-      //     base64.push(chunk.toString("base64"));
-      //   });
-      //   stream.on("error", (err) => {
-      //     console.log(err);
-      //   });
-      // });
-
       dictData[event.source.userId].push(event.message.id);
-
       const CustomPayload = {
         type: "text",
         text: "กรุณาระบุระดับของอุบัติเหตุ\n1.อุบัติเหตุที่ไม่สร้างความบาดเจ็บ\n2.อุบัติเหตุที่สร้างความบาดเจ็บเล็กน้อย\n3.อุบัติเหตุที่สร้างความบาดเจ็บรุนแรง เช่น บาดเจ็บสาหัด พิการ หรือเสียชีวิต",
@@ -207,6 +224,14 @@ const handleEvent = async (event) => {
                 type: "message",
                 label: "ระดับ 3",
                 text: "3",
+              },
+            },
+            {
+              type: "action",
+              action: {
+                type: "message",
+                label: "ยกเลิก",
+                text: "ยกเลิก",
               },
             },
           ],
@@ -238,6 +263,14 @@ const handleEvent = async (event) => {
               action: {
                 type: "location",
                 label: "Location",
+              },
+            },
+            {
+              type: "action",
+              action: {
+                type: "message",
+                label: "ยกเลิก",
+                text: "ยกเลิก",
               },
             },
           ],
@@ -275,10 +308,16 @@ const handleEvent = async (event) => {
       dictData[event.source.userId].push(date.toISOString());
       dictData[event.source.userId].push(event.message.text);
       dictData[event.source.userId].push(Reporter[event.source.userId]);
-      const CustomPayload = {
-        type: "text",
-        text: "ได้รับข้อมูลอุบัติเหตุแล้ว รอเจ้าหน้าที่ดำเนินการนะครับ",
-      };
+      const CustomPayload = [
+        {
+          type: "text",
+          text: "ได้รับข้อมูลอุบัติเหตุแล้ว รอเจ้าหน้าที่ดำเนินการนะครับ",
+        },
+        {
+          type: "text",
+          text: `สามารถติดตามอุบัติเหตุที่ เว็บไซต์ http://192.168.0.105:3000`,
+        },
+      ];
 
       axios
         .post(`${API}accidents`, {
@@ -332,15 +371,12 @@ const handleEvent = async (event) => {
       .catch((err) => {
         console.log(err.response?.data);
       });
-    // client.getMessageContent("16811768450085").then((stream) => {
-    //   stream.on("data", (chunk) => {
-    //     const base64 = chunk.toString("base64"); // '7b0a2020...'
-    //     console.log(base64);
-    //   });
-    //   stream.on("error", (err) => {
-    //     console.log(err);
-    //   });
-    // });
+  } else {
+    const CustomPayload = {
+      type: "text",
+      text: "คำสั่งของท่านไม่อยู่ในการทำงาน",
+    };
+    ReplyMessage(event.replyToken, CustomPayload);
   }
 };
 
