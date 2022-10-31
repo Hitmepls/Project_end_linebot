@@ -163,8 +163,8 @@ function MapsHere(props: Dataprops) {
           <Stack direction="row">
             <img src={l3} alt="level3" />
             <Typography variant="subtitle1">
-              หมายถึง อุบัติเหตุระดับที่ 3 สร้างความบาดเจ็บรุนแรง
-              ไม่สร้างความบาดเจ็บ
+              หมายถึง อุบัติเหตุระดับที่ 3 สร้างความบาดเจ็บรุนแรง เช่น
+              บาดเจ็บสาหัส พิการ หรือเสียชีวิต
             </Typography>
           </Stack>
         </Stack>
@@ -205,6 +205,8 @@ function MapsHere(props: Dataprops) {
               }}
               onClick={() => {
                 setSelected(item);
+                setLat(Number(item.Latitude));
+                setLng(Number(item.Longitude));
                 getImg(item.ImageID);
                 console.log(item);
               }}
@@ -221,8 +223,6 @@ function MapsHere(props: Dataprops) {
             }
             onCloseClick={() => {
               setSelected(undefined);
-              setLat(Number(selected.Latitude));
-              setLng(Number(selected.Longitude));
             }}
           >
             <div className="Description">

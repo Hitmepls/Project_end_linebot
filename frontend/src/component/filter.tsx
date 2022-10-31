@@ -50,11 +50,11 @@ export default function Filter(props: Dataprops) {
       props.state1(event.target.checked);
     if (event.target.id === acidentStatus[1])
       props.state2(event.target.checked);
-    if (event.target.id === acidentStatus[1])
-      props.state2(event.target.checked);
+    if (event.target.id === acidentStatus[2])
+      props.state3(event.target.checked);
   };
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="xl">
       <Box sx={{ flexGrow: 1 }}>
         <Grid container spacing={0}>
           <Grid xs={12}>
@@ -64,7 +64,7 @@ export default function Filter(props: Dataprops) {
               </Typography>
             </Item>
           </Grid>
-          <Grid item xs={4} padding={1}>
+          <Grid item xs={3} padding={1}>
             <Item elevation={0}>
               <Typography>แสดงระดับความรุนแรง</Typography>
               {levelText.map((e) => (
@@ -82,14 +82,13 @@ export default function Filter(props: Dataprops) {
               ))}
             </Item>
           </Grid>
-          <Grid item xs={4} padding={1}>
+          <Grid item xs={3} padding={1}>
             <Item elevation={0}>
               <Typography>สถานะการดำเนินการ</Typography>
               <FormGroup>
                 {acidentStatus.map((e) => (
                   <FormControlLabel
                     key={e}
-                    disabled={acidentStatus.indexOf(e) == 2 ? true : false}
                     control={
                       <Checkbox
                         id={e}
@@ -103,9 +102,14 @@ export default function Filter(props: Dataprops) {
               </FormGroup>
             </Item>
           </Grid>
-          <Grid item xs={4} padding={1}>
+          <Grid item xs={3} padding={1}>
             <Item elevation={0}>
               <Typography>สถานที่</Typography>
+            </Item>
+          </Grid>
+          <Grid item xs={3} padding={1}>
+            <Item elevation={0}>
+              <Typography>วันที่</Typography>
             </Item>
           </Grid>
           <Grid item xs={12} padding={1}>

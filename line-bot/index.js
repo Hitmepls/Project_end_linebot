@@ -13,6 +13,7 @@ const lineconfig = {
 const client = new line.Client(lineconfig);
 app.post("/webhook", line.middleware(lineconfig), async (req, res) => {
   try {
+    // const events = req.body.events;
     const events = req.body.events;
     console.log("event=>>>>", events);
     return events.length > 0
@@ -22,6 +23,7 @@ app.post("/webhook", line.middleware(lineconfig), async (req, res) => {
     res.status(500).end();
   }
 });
+
 // API
 const API = "http://localhost:8080/";
 
