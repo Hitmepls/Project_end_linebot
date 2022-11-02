@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Box from "@mui/material/Box";
@@ -9,6 +9,12 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import { Typography } from "@mui/material";
 import Container from "@material-ui/core/Container";
+import moment, { Moment } from "moment";
+import { AccidentsInterface } from "../models/Iacident";
+import TextField from "@mui/material/TextField";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 const levelText = ["ระดับ 1", "ระดับ 2", "ระดับ 3"];
 const acidentStatus = [
   "รอดำเนินการ",
@@ -35,6 +41,8 @@ type Dataprops = {
 };
 
 export default function Filter(props: Dataprops) {
+  const [date1, setDate1] = useState<Moment | null>(moment().add(-7, "days"));
+  const [date2, setDate2] = useState<Moment | null>(moment());
   const handleLevelChange = (
     event: React.ChangeEvent<{ id?: string; checked: any }>
   ) => {
@@ -56,7 +64,7 @@ export default function Filter(props: Dataprops) {
   return (
     <Container maxWidth="xl">
       <Box sx={{ flexGrow: 1 }}>
-        <Grid container spacing={0}>
+        <Grid container spacing={0} alignItems="stretch">
           <Grid xs={12}>
             <Item elevation={0}>
               <Typography variant="h5" color="primary">
@@ -64,7 +72,7 @@ export default function Filter(props: Dataprops) {
               </Typography>
             </Item>
           </Grid>
-          <Grid item xs={3} padding={1}>
+          <Grid item xs={3} md={3} padding={1}>
             <Item elevation={0}>
               <Typography>แสดงระดับความรุนแรง</Typography>
               {levelText.map((e) => (
@@ -82,7 +90,7 @@ export default function Filter(props: Dataprops) {
               ))}
             </Item>
           </Grid>
-          <Grid item xs={3} padding={1}>
+          <Grid item xs={3} md={2} padding={1}>
             <Item elevation={0}>
               <Typography>สถานะการดำเนินการ</Typography>
               <FormGroup>
@@ -102,14 +110,43 @@ export default function Filter(props: Dataprops) {
               </FormGroup>
             </Item>
           </Grid>
-          <Grid item xs={3} padding={1}>
+          <Grid item xs={3} md={2} padding={1}>
             <Item elevation={0}>
               <Typography>สถานที่</Typography>
             </Item>
           </Grid>
-          <Grid item xs={3} padding={1}>
-            <Item elevation={0}>
+          <Grid item xs={3} md={5} padding={1}>
+            <Item elevation={1}>
               <Typography>วันที่</Typography>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateTimePicker
+                  renderInput={(props) => <TextField {...props} />}
+                  label="เริ่มต้น"
+                  ampm={false}
+                  inputFormat="DD-MM-YYYY HH:mm:ss"
+                  value={date1}
+                  maxDate={date2}
+                  onChange={(newValue) => {
+                    setDate1(newValue);
+                  }}
+                />
+              </LocalizationProvider>
+            </Item>
+            <Item elevation={0}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateTimePicker
+                  renderInput={(props) => <TextField {...props} />}
+                  label="สิ้นสุด"
+                  inputFormat="DD-MM-YYYY HH:mm:ss"
+                  disableFuture={true}
+                  ampm={false}
+                  value={date2}
+                  minDate={date1}
+                  onChange={(newValue) => {
+                    setDate2(newValue);
+                  }}
+                />
+              </LocalizationProvider>
             </Item>
           </Grid>
           <Grid item xs={12} padding={1}>

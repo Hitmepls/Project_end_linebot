@@ -13,9 +13,17 @@ export default function Test() {
   const [result, setResult] = useState("คลิกเลย");
 
   const comparedate = () => {
-    console.log(moment(date2).add(-7, "days").format("YYYY-MM-DD"));
+    let startdate =
+      date1?.toISOString().split("T")[0] +
+      " " +
+      date1?.toISOString().split("T")[1];
+    let endtdate =
+      date2?.toISOString().split("T")[0] +
+      " " +
+      date2?.toISOString().split("T")[1];
+    getAccident(startdate, endtdate);
   };
-  const getAccident = async (date1?: String, date2?: String) => {
+  const getAccident = async (date1: String, date2: String) => {
     const apiUrl = `http://localhost:8080/accidentsFromDate/${date1}/${date2}`;
     const requestOptions = {
       method: "GET",
@@ -30,9 +38,7 @@ export default function Test() {
         setAccident(res.data);
       });
   };
-  useEffect(() => {
-    getAccident(date1?.toISOString(), date2?.toISOString());
-  }, [date1, date2]);
+
   return (
     <div>
       <br />
@@ -41,6 +47,8 @@ export default function Test() {
         <DateTimePicker
           renderInput={(props) => <TextField {...props} />}
           label="เริ่มต้น"
+          ampm={false}
+          inputFormat="DD-MM-YYYY HH:mm:ss"
           value={date1}
           maxDate={date2}
           onChange={(newValue) => {
@@ -52,9 +60,11 @@ export default function Test() {
         <DateTimePicker
           renderInput={(props) => <TextField {...props} />}
           label="สิ้นสุด"
+          inputFormat="DD-MM-YYYY HH:mm:ss"
+          disableFuture={true}
+          ampm={false}
           value={date2}
           minDate={date1}
-          maxDate={moment()}
           onChange={(newValue) => {
             setDate2(newValue);
           }}
@@ -62,7 +72,9 @@ export default function Test() {
       </LocalizationProvider>
 
       {accidents.map((e) => (
-        <p>{moment(e.Time).format("YYYY-MM-DD hh:mm:SS a")}</p>
+        <div>
+          <p>{moment(e.Time).format("DD-MM-YYYY HH:mm:ss ")}</p>
+        </div>
       ))}
 
       <p>{result}</p>

@@ -232,7 +232,8 @@ function MapsHere(props: Dataprops) {
                 <p>
                   รายละเอียดเหตุการณ์: {selected?.Description}
                   <br />
-                  วันที่แจ้งเหตุ: {moment(selected.Time).format("DD MMMM YYYY")}
+                  วันที่แจ้งเหตุ:{" "}
+                  {moment(selected.Time).locale("th").format("DD MMMM YYYY")}
                   <br />
                   เวลาแจ้งเหตุ: {moment(selected.Time).format("HH:mm:ss")}
                   <br />
