@@ -1,6 +1,7 @@
 import { useState } from "react";
 import GoogleMap from "./component/Map";
 import Nav from "./component/Nav";
+import Test from "./component/Test";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 const HeadingText = "เว็บไซต์รายงานอุบัติเหตุ";
@@ -24,6 +25,7 @@ function App() {
               />
             }
           />
+          <Route path="/Test" element={<Test />} />
         </Routes>
       </BrowserRouter>
     </div>

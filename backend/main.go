@@ -13,7 +13,8 @@ func main() {
 	r.Use(CORSMiddleware())
 	// User Routes
 	r.GET("/accidents", controller.ListAccidents)
-	r.GET("/accidentsActive", controller.ListAccidentsActive)
+	// r.GET("/accidentsDay/:days/daysago/", controller.ListAccidentsDaysAgo)
+	r.GET("/accidentsFromDate/:date1/*date2", controller.ListAccidentsFromDate)
 	r.GET("/accidents/count", controller.GetCountAccidentsActive)
 	r.GET("/accidents/:id", controller.GetAccidents)
 	r.POST("/accidents", controller.CreateAccidents)

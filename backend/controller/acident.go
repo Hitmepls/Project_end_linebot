@@ -54,6 +54,29 @@ func ListAccidents(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": users})
 }
 
+// func ListAccidentsDaysAgo(c *gin.Context) {
+// 	var users []entity.Accident
+// 	// days := c.Param("days")
+// 	// .Add((time.Hour*-24)*7)
+// 	if err := entity.DB().Preload("Reporter").Preload("Level").Preload("ProcessStatus").Raw("SELECT * FROM Accidents where date_time  BETWEEN ? and ?", time.Now(), time.Now()).Find(&users).Error; err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+// 		return
+// 	}
+
+//		c.JSON(http.StatusOK, gin.H{"data": users})
+//	}
+func ListAccidentsFromDate(c *gin.Context) {
+	var users []entity.Accident
+	date1 := c.Param("date1")
+	date2 := c.Param("date2")
+	if err := entity.DB().Preload("Reporter").Preload("Level").Preload("ProcessStatus").Raw("SELECT * FROM Accidents where time  BETWEEN ? and ?", date1, date2[1:]).Find(&users).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": users})
+}
+
 // GET /acident no status 3
 func ListAccidentsActive(c *gin.Context) {
 	var users []entity.Accident
