@@ -9,26 +9,30 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import { Typography } from "@mui/material";
 import Container from "@material-ui/core/Container";
-import moment, { Moment } from "moment";
-import { AccidentsInterface } from "../models/Iacident";
 import TextField from "@mui/material/TextField";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import moment, { Moment } from "moment";
 const levelText = ["ระดับ 1", "ระดับ 2", "ระดับ 3"];
 const acidentStatus = [
   "รอดำเนินการ",
   "กำลังดำเนินการ",
   "ได้รับการช่วยเหลือแล้ว",
 ];
+
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: "#fff",
   ...theme.typography.body1,
   padding: theme.spacing(1),
+
   textAlign: "center",
 }));
 type Dataprops = {
   filter: boolean;
+  today: boolean;
+  sevenago: boolean;
+  dateoption: boolean;
   setfilter: (item: boolean) => void;
   level1: (item: boolean) => void;
   level2: (item: boolean) => void;
@@ -36,13 +40,18 @@ type Dataprops = {
   state1: (item: boolean) => void;
   state2: (item: boolean) => void;
   state3: (item: boolean) => void;
+  setToday: (item: boolean) => void;
+  setSevenago: (item: boolean) => void;
+  setDateoption: (item: boolean) => void;
+  date1: Moment | null;
+  date2: Moment | null;
+  setDate1: (item: Moment | null) => void;
+  setDate2: (item: Moment | null) => void;
   levelacident: boolean[];
   stateAcident: boolean[];
 };
 
 export default function Filter(props: Dataprops) {
-  const [date1, setDate1] = useState<Moment | null>(moment().add(-7, "days"));
-  const [date2, setDate2] = useState<Moment | null>(moment());
   const handleLevelChange = (
     event: React.ChangeEvent<{ id?: string; checked: any }>
   ) => {
@@ -61,6 +70,30 @@ export default function Filter(props: Dataprops) {
     if (event.target.id === acidentStatus[2])
       props.state3(event.target.checked);
   };
+  const handleDateChange = (
+    event: React.ChangeEvent<{ id?: string; checked: any }>
+  ) => {
+    if (event.target.id === "1") {
+      if (props.today) {
+        return;
+      }
+      props.setDate1(moment("00:00:00", "HH:mm:ss"));
+      props.setDate2(moment("23:59:59", "HH:mm:ss"));
+      props.setSevenago(false);
+      props.setToday(event.target.checked);
+    }
+    if (event.target.id === "2") {
+      if (props.sevenago) {
+        return;
+      }
+      props.setDate1(moment("00:00:00", "HH:mm:ss").add(-7, "days"));
+      props.setDate2(moment("23:59:59", "HH:mm:ss"));
+      props.setSevenago(event.target.checked);
+      props.setToday(false);
+    }
+    if (event.target.id === "3") props.setDateoption(event.target.checked);
+  };
+
   return (
     <Container maxWidth="xl">
       <Box sx={{ flexGrow: 1 }}>
@@ -116,38 +149,74 @@ export default function Filter(props: Dataprops) {
             </Item>
           </Grid>
           <Grid item xs={3} md={5} padding={1}>
-            <Item elevation={1}>
-              <Typography>วันที่</Typography>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DateTimePicker
-                  renderInput={(props) => <TextField {...props} />}
-                  label="เริ่มต้น"
-                  ampm={false}
-                  inputFormat="DD-MM-YYYY HH:mm:ss"
-                  value={date1}
-                  maxDate={date2}
-                  onChange={(newValue) => {
-                    setDate1(newValue);
-                  }}
-                />
-              </LocalizationProvider>
-            </Item>
             <Item elevation={0}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DateTimePicker
-                  renderInput={(props) => <TextField {...props} />}
-                  label="สิ้นสุด"
-                  inputFormat="DD-MM-YYYY HH:mm:ss"
-                  disableFuture={true}
-                  ampm={false}
-                  value={date2}
-                  minDate={date1}
-                  onChange={(newValue) => {
-                    setDate2(newValue);
-                  }}
-                />
-              </LocalizationProvider>
+              <Typography>วันเกิดเหตุ</Typography>
+
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    id={"1"}
+                    disabled={props.dateoption}
+                    checked={props.today}
+                    onChange={handleDateChange}
+                  />
+                }
+                label={"วันนี้"}
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    disabled={props.dateoption}
+                    id={"2"}
+                    checked={props.sevenago}
+                    onChange={handleDateChange}
+                  />
+                }
+                label={"7วันที่ผ่านมา"}
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    id={"3"}
+                    checked={props.dateoption}
+                    onChange={handleDateChange}
+                  />
+                }
+                label={"ขั้นสูง"}
+              />
             </Item>
+            {props.dateoption && (
+              <Item elevation={0}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateTimePicker
+                    renderInput={(props) => <TextField {...props} />}
+                    label="เริ่มต้น"
+                    ampm={false}
+                    inputFormat="DD-MM-YYYY HH:mm:ss"
+                    value={props.date1}
+                    maxDate={props.date2}
+                    onChange={(newValue) => {
+                      props.setDate1(newValue);
+                    }}
+                  />
+                </LocalizationProvider>
+
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateTimePicker
+                    renderInput={(props) => <TextField {...props} />}
+                    label="สิ้นสุด"
+                    inputFormat="DD-MM-YYYY HH:mm:ss"
+                    disableFuture={true}
+                    ampm={false}
+                    value={props.date2}
+                    minDate={props.date1}
+                    onChange={(newValue) => {
+                      props.setDate2(newValue);
+                    }}
+                  />
+                </LocalizationProvider>
+              </Item>
+            )}
           </Grid>
           <Grid item xs={12} padding={1}>
             <Item elevation={0}>

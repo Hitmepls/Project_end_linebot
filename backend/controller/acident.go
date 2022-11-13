@@ -25,7 +25,7 @@ func CreateAccidents(c *gin.Context) {
 func GetAccidents(c *gin.Context) {
 	var user []entity.Accident
 	id := c.Param("id")
-	if err := entity.DB().Preload("Reporter").Preload("Level").Preload("ProcessStatus").Raw("SELECT * FROM Accidents WHERE reporter_id = ?", id).Find(&user).Error; err != nil {
+	if err := entity.DB().Preload("Reporter").Preload("Level").Preload("ProcessStatus").Raw("SELECT * FROM Accidents WHERE reporter_id = ? ORDER by time DESC LIMIT 3", id).Find(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

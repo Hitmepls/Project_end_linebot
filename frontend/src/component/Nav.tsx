@@ -65,12 +65,12 @@ export default function Nav(props: Dataprops) {
               ตัวกรอง
             </Button>
           )}
-          <Button href="/Test" variant="outlined">
+          {/* <Button href="/Test" variant="outlined">
             Test
           </Button>
           <Badge badgeContent={countAcident} color="info">
             <MailIcon color="info" />
-          </Badge>
+          </Badge> */}
         </Toolbar>
       </AppBar>
     </Box>

@@ -79,6 +79,8 @@ const handleEvent = async (event) => {
       },
     };
     ReplyMessage(event.replyToken, CustomPayload);
+  } else if (event?.type === "unfollow") {
+    console.log(event);
   } else if (event?.type === "follow") {
     axios
       .get(
@@ -198,7 +200,23 @@ const handleEvent = async (event) => {
   } else if (dictState[event.source.userId] == 1) {
     if (event.message.type == "image") {
       dictState[event.source.userId] = 2;
-      dictData[event.source.userId].push(event.message.id);
+      var data = [];
+      client.getMessageContent(event.message.id).then((stream) => {
+        stream.on("data", (chunk) => {
+          data.push(chunk);
+        });
+        stream.on("end", function () {
+          //at this point data is an array of Buffers
+          //so Buffer.concat() can make us a new Buffer
+          //of all of them together
+          var buffer = Buffer.concat(data);
+          dictData[event.source.userId].push(buffer.toString("base64"));
+        });
+        stream.on("error", (err) => {
+          console.log(err);
+        });
+      });
+
       const CustomPayload = {
         type: "text",
         text: "กรุณาระบุระดับของอุบัติเหตุ\n1.อุบัติเหตุที่ไม่สร้างความบาดเจ็บ\n2.อุบัติเหตุที่สร้างความบาดเจ็บเล็กน้อย\n3.อุบัติเหตุที่สร้างความบาดเจ็บรุนแรง เช่น บาดเจ็บสาหัด พิการ หรือเสียชีวิต",
@@ -355,23 +373,32 @@ const handleEvent = async (event) => {
       .get(`${API}accidents/${Reporter[event.source.userId]}`)
       .then((res) => {
         const data = res.data.data;
-        const CustomPayload = [];
-        CustomPayload.push({
-          type: "text",
-          text: `ท่านได้แจ้งเหตุการณ์มาทั้งหมด ${data.length} เหตุการณ์`,
-        });
-        data.map((item, index) => {
+
+        if (data.length === 0) {
+          CustomPayload = {
+            type: "text",
+            text: "ท่านยังไม่เคยแจ้งอุบัติเหตุเข้ามา",
+          };
+          ReplyMessage(event.replyToken, CustomPayload);
+        } else {
+          const CustomPayload = [];
           CustomPayload.push({
             type: "text",
-            text: `${index + 1}.${item.Description} \nสถานะ:${
-              item.ProcessStatus.Name
-            }`,
+            text: `${data.length} เหตุการณ์ล่าสุดที่ท่านแจ้งเข้ามา`,
           });
-        });
-        ReplyMessage(event.replyToken, CustomPayload);
+          data.map((item, index) => {
+            CustomPayload.push({
+              type: "text",
+              text: `${index + 1}.${item.Description} \nสถานะ:${
+                item.ProcessStatus.Name
+              }`,
+            });
+          });
+          ReplyMessage(event.replyToken, CustomPayload);
+        }
       })
       .catch((err) => {
-        console.log(err.response?.data);
+        console.log(err);
       });
   } else {
     const CustomPayload = {

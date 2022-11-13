@@ -10,7 +10,6 @@ import l1 from "../Icon/level1.png";
 import l2 from "../Icon/level2.png";
 import l3 from "../Icon/level3.png";
 import FilterBar from "./filter";
-import moment from "moment";
 import { Typography } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -22,7 +21,9 @@ import usePlacesAutocomplete, {
   getLatLng,
 } from "use-places-autocomplete";
 import Dialog from "@mui/material/Dialog";
+import moment, { Moment } from "moment";
 const apikey = process.env.REACT_APP_GOOGLE_MAP_API_KEY;
+const asscessToken = process.env.REACT_APP_ACCESS_TOKEN;
 
 type Dataprops = {
   filter: boolean;
@@ -33,8 +34,19 @@ function MapsHere(props: Dataprops) {
   const [accidents, setAccident] = useState<AccidentsInterface[]>([]);
   const [selected, setSelected] = useState<AccidentsInterface>();
   const [imgUrl, setImgUrl] = useState(String);
-  const [lat, setLat] = useState(14.9798997);
-  const [lng, setLng] = useState(102.0977693);
+  const [lat, setLat] = useState(13.752547578244073);
+  const [lng, setLng] = useState(100.49271903050739);
+  const [zoom, setZoom] = useState(7);
+
+  const [date1, setDate1] = useState<Moment | null>(
+    moment("00:00:00", "HH:mm:ss").add(-7, "days")
+  );
+  const [date2, setDate2] = useState<Moment | null>(
+    moment("23:59:59", "HH:mm:ss")
+  );
+  const [today, setToday] = useState(false);
+  const [sevenago, setSevenago] = useState(true);
+  const [dateoption, setDateoption] = useState(false);
   const [level1, setLevel1] = useState(true);
   const [level2, setLevel2] = useState(true);
   const [level3, setLevel3] = useState(true);
@@ -42,37 +54,55 @@ function MapsHere(props: Dataprops) {
   const [state2, setState2] = useState(true);
   const [state3, setState3] = useState(false);
   const [imgpop, setImgpop] = useState(false);
-
   const levelacident = [level1, level2, level3];
   const level = [l1, l2, l3];
   const stateAcident = [state1, state2, state3];
 
-  async function getImg(imgID: String) {
-    const requestOptions = {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer jJ/3fHe/jn6IIsYEhFN0N/sdWOQ+9x2zN/xd3bAKDkat/YBRc2YBXlAlXztHDBAfHcLRvYn7Y44udA3oyrDxihEDMohCqI96D6/PtHGYNsedS7D28vz6Pt1A0yzTpUc95yVx312IAK8V9ZQnjcnO4wdB04t89/1O/w1cDnyilFU=`,
-        "Content-Type": "application/json",
-      },
-    };
-    const response = await fetch(
-      `https://api-data.line.me/v2/bot/message/${imgID}/content`,
-      requestOptions
-    );
-    const imageBlob = await response.blob();
-    const reader = new FileReader();
-    reader.readAsDataURL(imageBlob);
-    reader.onloadend = () => {
-      const base64data = reader.result;
-      setImgUrl(String(base64data));
-    };
-  }
+  // async function getImg(imgID: String) {
+  //   const requestOptions = {
+  //     method: "GET",
+  //     headers: {
+  //       Authorization: `Bearer ${asscessToken}`,
+  //       "Content-Type": "application/json",
+  //     },
+  //   };
+  //   console.log(requestOptions);
+  //   const response = await fetch(
+  //     `https://api-data.line.me/v2/bot/message/${imgID}/content`,
+  //     requestOptions
+  //   );
+  //   const imageBlob = await response.blob();
+  //   const reader = new FileReader();
+  //   reader.readAsDataURL(imageBlob);
+  //   reader.onloadend = () => {
+  //     const base64data = reader.result;
+  //     setImgUrl(String(base64data));
+  //   };
+  // }
   const handleimg = () => {
     setImgpop(!imgpop);
-    console.log(imgpop);
   };
-  const getAccident = async () => {
-    const apiUrl = "http://localhost:8080/accidents";
+  // const getAccident = async () => {
+  //   const apiUrl = "http://localhost:8080/accidents";
+  //   const requestOptions = {
+  //     method: "GET",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   };
+
+  //   fetch(apiUrl, requestOptions)
+  //     .then((response) => response.json())
+  //     .then((res) => {
+  //       if (res.data) {
+  //         setAccident(res.data);
+  //       } else {
+  //         console.log("else");
+  //       }
+  //     });
+  // };
+  const getAccidentDate = async (date1: String, date2: String) => {
+    const apiUrl = `http://localhost:8080/accidentsFromDate/${date1}/${date2}`;
     const requestOptions = {
       method: "GET",
       headers: {
@@ -83,16 +113,21 @@ function MapsHere(props: Dataprops) {
     fetch(apiUrl, requestOptions)
       .then((response) => response.json())
       .then((res) => {
-        if (res.data) {
-          setAccident(res.data);
-        } else {
-          console.log("else");
-        }
+        console.log(res.data);
+        setAccident(res.data);
       });
   };
   useEffect(() => {
-    getAccident();
-  }, []);
+    let startdate =
+      date1?.toISOString().split("T")[0] +
+      " " +
+      date1?.toISOString().split("T")[1];
+    let endtdate =
+      date2?.toISOString().split("T")[0] +
+      " " +
+      date2?.toISOString().split("T")[1];
+    getAccidentDate(startdate, endtdate);
+  }, [date1, date2]);
 
   const mapContainerStyle = {
     width: "auto",
@@ -127,20 +162,30 @@ function MapsHere(props: Dataprops) {
         <FilterBar
           filter={props.filter}
           setfilter={props.setfilter}
+          today={today}
+          sevenago={sevenago}
+          dateoption={dateoption}
           level1={(item: boolean) => setLevel1(item)}
           level2={(item: boolean) => setLevel2(item)}
           level3={(item: boolean) => setLevel3(item)}
           state1={(item: boolean) => setState1(item)}
           state2={(item: boolean) => setState2(item)}
           state3={(item: boolean) => setState3(item)}
+          setToday={(item: boolean) => setToday(item)}
+          setSevenago={(item: boolean) => setSevenago(item)}
+          setDateoption={(item: boolean) => setDateoption(item)}
           levelacident={levelacident}
           stateAcident={stateAcident}
+          date1={date1}
+          date2={date2}
+          setDate1={(item: Moment | null) => setDate1(item)}
+          setDate2={(item: Moment | null) => setDate2(item)}
         />
         <Search
           panTo={(lat: number, lng: number) => {
-            console.log(lng + "" + lng);
             setLat(lat);
             setLng(lng);
+            setZoom(11);
           }}
         />
       </Drawer>
@@ -171,15 +216,20 @@ function MapsHere(props: Dataprops) {
       </div>
       {imgpop && (
         <Dialog style={{ position: "absolute" }} open onClick={handleimg}>
-          <img src={imgUrl} onClick={handleimg} alt="no image" />
+          <img
+            src={`data:image/jpeg;base64,${imgUrl}`}
+            onClick={handleimg}
+            alt="no image"
+          />
         </Dialog>
       )}
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
-        zoom={12}
+        zoom={zoom}
         center={{ lat: lat, lng: lng }}
         options={option}
         onLoad={onMapload}
+        // onZoomChanged={() => setZoom(zoom)}
       >
         {accidents
           .filter(
@@ -207,8 +257,8 @@ function MapsHere(props: Dataprops) {
                 setSelected(item);
                 setLat(Number(item.Latitude));
                 setLng(Number(item.Longitude));
-                getImg(item.ImageID);
-                console.log(item);
+
+                setZoom(10);
               }}
             />
           ))}
@@ -232,8 +282,7 @@ function MapsHere(props: Dataprops) {
                 <p>
                   รายละเอียดเหตุการณ์: {selected?.Description}
                   <br />
-                  วันที่แจ้งเหตุ:{" "}
-                  {moment(selected.Time).locale("th").format("DD MMMM YYYY")}
+                  วันที่แจ้งเหตุ: {moment(selected.Time).format("DD MMMM YYYY")}
                   <br />
                   เวลาแจ้งเหตุ: {moment(selected.Time).format("HH:mm:ss")}
                   <br />
@@ -241,7 +290,14 @@ function MapsHere(props: Dataprops) {
                   <br />
                   สถานะการดำเนินการ: {selected.ProcessStatus.Name}
                 </p>
-                <img src={imgUrl} onClick={handleimg} alt="รูปอุบัติเหตุ" />
+                <img
+                  src={`data:image/jpeg;base64,${selected.ImageID}`}
+                  onClick={() => {
+                    setImgUrl(selected.ImageID);
+                    setImgpop(!imgpop);
+                  }}
+                  alt="รูปอุบัติเหตุ"
+                />
               </div>
             </div>
           </InfoWindowF>
