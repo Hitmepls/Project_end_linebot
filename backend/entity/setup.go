@@ -25,7 +25,7 @@ func SetupDatabase() {
 	)
 
 	db = database
-	// var ProcessStatus = []ProcessStatus{{Name: "pending"}, {Name: "processing"}, {Name: "complete"}}
+	// var ProcessStatus = []ProcessStatus{{Name: "รอดำเนินการ"}, {Name: "กำลังดำเนินการ"}, {Name: "ดำเนินการเสร็จสิ้น"}}
 	// db.Create(&ProcessStatus)
 	// var Level = []Level{{Name: "อุบัติเหตุที่ไม่สร้างความบาดเจ็บ"}, {Name: "อุบัติเหตุที่สร้างความบาดเจ็บเล็กน้อย"}, {Name: "อุบัติเหตุที่สร้างความบาดเจ็บรุนแรง"}}
 	// db.Create(&Level)

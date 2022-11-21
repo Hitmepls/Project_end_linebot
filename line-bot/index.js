@@ -91,15 +91,16 @@ const handleEvent = async (event) => {
       .then((response) => {
         console.log(response);
         axios
-          .post(
-            `${API}reporters`,
-            {
-              UserId: response.userId,
-              DisplayName: response.displayName,
-              PictureUrl: response.pictureUrl,
-            },
-            GetReporter()
-          )
+          .post(`${API}reporters`, {
+            UserId: response.userId,
+            DisplayName: response.displayName,
+            PictureUrl: response.pictureUrl,
+          })
+          .then((res) => {
+            if (res?.data) {
+              GetReporter();
+            }
+          })
           .catch((err) => {
             console.log(err.response.data);
           });
@@ -107,7 +108,10 @@ const handleEvent = async (event) => {
       .catch((err) => {
         console.log(err.response?.data);
       });
-  } else if (event.message?.text == "แจ้งอุบัติเหตุ") {
+  } else if (
+    event.message?.text == "แจ้งอุบัติเหตุ" &&
+    !(dictState[event.source.userId] >= 0)
+  ) {
     dictData[event.source.userId] = [];
     dictState[event.source.userId] = 0;
     const CustomPayload = [
@@ -219,7 +223,7 @@ const handleEvent = async (event) => {
 
       const CustomPayload = {
         type: "text",
-        text: "กรุณาระบุระดับของอุบัติเหตุ\n1.อุบัติเหตุที่ไม่สร้างความบาดเจ็บ\n2.อุบัติเหตุที่สร้างความบาดเจ็บเล็กน้อย\n3.อุบัติเหตุที่สร้างความบาดเจ็บรุนแรง เช่น บาดเจ็บสาหัด พิการ หรือเสียชีวิต",
+        text: "กรุณาระบุระดับของอุบัติเหตุ\n1.อุบัติเหตุที่ไม่สร้างความบาดเจ็บ\n2.อุบัติเหตุที่สร้างความบาดเจ็บเล็กน้อย\n3.อุบัติเหตุที่สร้างความบาดเจ็บรุนแรง เช่น บาดเจ็บสาหัส พิการ หรือเสียชีวิต",
         quickReply: {
           items: [
             {
@@ -261,7 +265,7 @@ const handleEvent = async (event) => {
     } else {
       const CustomPayload = {
         type: "text",
-        text: "ขอรายรูปภาพด้วยครับ",
+        text: "กรุณาส่งรูปภาพเหตุการณ์ด้วยครับด้วยครับ",
       };
       ReplyMessage(event.replyToken, CustomPayload);
     }
@@ -335,7 +339,7 @@ const handleEvent = async (event) => {
         },
         {
           type: "text",
-          text: `สามารถติดตามอุบัติเหตุที่ เว็บไซต์ http://192.168.0.105:3000`,
+          text: `สามารถติดตามอุบัติเหตุที่ เว็บไซต์ http://192.168.0.103:3000`,
         },
       ];
 
